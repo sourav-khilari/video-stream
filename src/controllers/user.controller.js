@@ -89,7 +89,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {ApiError} from "../utils/ApiError.js"
 import { User} from "../models/User.model.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import {uploadOnCloudinary} from "../utils/cloudnary.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
@@ -204,7 +204,7 @@ const loginUser = asyncHandler(async (req, res) =>{
         throw new ApiError(400, "username or email is required")
     }
     
-    // Here is an alternative of above code based on logic discussed in video:
+    // Here is an alternative of above code
     // if (!(username || email)) {
     //     throw new ApiError(400, "username or email is required")
         
@@ -221,7 +221,7 @@ const loginUser = asyncHandler(async (req, res) =>{
    const isPasswordValid = await user.isPasswordCorrect(password)
 
    if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials")
+        throw new ApiError(401, "Invalid user credentials")
     }
 
    const {accessToken, refreshToken} = await generateAccessAndRefereshTokens(user._id)
@@ -229,6 +229,7 @@ const loginUser = asyncHandler(async (req, res) =>{
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
     const options = {
+        //server editable
         httpOnly: true,
         secure: true
     }
@@ -384,7 +385,7 @@ const updateUserAvatar = asyncHandler(async(req, res) => {
         throw new ApiError(400, "Avatar file is missing")
     }
 
-    //TODO: delete old image - assignment
+ 
 
     const avatar = await uploadOnCloudinary(avatarLocalPath)
 
@@ -518,9 +519,17 @@ const getUserChannelProfile = asyncHandler(async(req, res) => {
 })
 
 const getWatchHistory = asyncHandler(async(req, res) => {
+    //it return string and at the time of finding it converts to object(_id) it handles by mongoose
+    //req.user.id
+
+
+
     const user = await User.aggregate([
         {
             $match: {
+                //it gives error because it is not handled by mongoose and in case of aggregate it goes directly as it is
+                //_id=req.user.id
+
                 _id: new mongoose.Types.ObjectId(req.user._id)
             }
         },
