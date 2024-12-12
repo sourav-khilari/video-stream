@@ -9,6 +9,7 @@ const userSchema=new Schema({
         unique:true,
         lowercase:true,
         trim:true,
+        //for repeatdly search 
         index:true
     },
     email:{
@@ -47,10 +48,12 @@ const userSchema=new Schema({
     }
 },
 {
+    //add automatically createdAt and updatedAt
     timestamps:true
 }
 )
 
+//just run before save
 //arrow function not use because it does not have this reference
 userSchema.pre("save",async function (next){
     if(!this.isModified("password")) return next()
@@ -92,3 +95,8 @@ userSchema.methods.generateRefreshToken=function(){
 
 
 export const User=mongoose.model("User",userSchema)
+
+
+
+
+
